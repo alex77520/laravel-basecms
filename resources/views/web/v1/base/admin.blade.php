@@ -307,6 +307,8 @@
     <script src="{{ URL::asset('/web/v1/libs/bower/fullcalendar/dist') }}/fullcalendar.min.js" type="text/javascript"></script>
     <script src="{{ URL::asset('/web/v1/assets/js') }}/fullcalendar.js" type="text/javascript"></script>
     <script src="{{ URL::asset('/web/v1/assets/js') }}/common.js" type="text/javascript"></script>
+    <script src="{{ URL::asset('/web/v1/libs/bower/marked') }}/marked.js" type="text/javascript"></script>
+	
 	<script>
 	$(function(){
 		$("#commonModal").on("hidden.bs.modal",function(){

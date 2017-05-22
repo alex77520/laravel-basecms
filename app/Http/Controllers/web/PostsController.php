@@ -88,7 +88,7 @@ class PostsController extends Controller
             $cid = $request->get('classify');
             if($cid !== '0'){
                 # 证明存在的，那就获取他的所有文章ID
-                $PostRelations = PostRelation::where('pc_id',$cid)->get();
+                $PostRelations = PostRelation::withTrashed()->where('pc_id',$cid)->get();
                 if($PostRelations != null){
                     foreach($PostRelations as $relation){
                         $post_ids[] = $relation->post_id;
@@ -98,12 +98,12 @@ class PostsController extends Controller
         }
         if(count($post_ids) > 0){
             if($key == null){
-                $Posts = Posts::where($where)
+                $Posts = Posts::withTrashed()->where($where)
                         ->whereIn('post_id',$post_ids)
                         ->orderBy('created_at','desc')
                         ->paginate(20);
             }else{
-                $Posts = Posts::where($where)
+                $Posts = Posts::withTrashed()->where($where)
                         ->whereIn('post_id',$post_ids)
                         ->where(function($query) use ($key){
                             $query->orWhere('title','like','%'.$key.'%')->orWhere('source','like','%'.$key.'%')->orWhere('tags','like','%'.$key.'%');
@@ -113,11 +113,11 @@ class PostsController extends Controller
             }
         }else{
             if($key == null){
-                $Posts = Posts::where($where)
+                $Posts = Posts::withTrashed()->where($where)
                         ->orderBy('created_at','desc')
                         ->paginate(20);
             }else{
-                $Posts = Posts::where($where)
+                $Posts = Posts::withTrashed()->where($where)
                         ->where(function($query) use ($key){
                             $query->orWhere('title','like','%'.$key.'%')->orWhere('source','like','%'.$key.'%')->orWhere('tags','like','%'.$key.'%');
                         })
@@ -149,7 +149,7 @@ class PostsController extends Controller
         $where = [
             'post_id' => $request->input('post_id'),
         ];
-        $Post = Posts::where($where)->first();
+        $Post = Posts::withTrashed()->where($where)->first();
         if(!$Post){
             return parent::_error('文章不存在','modal');
         }
@@ -158,16 +158,41 @@ class PostsController extends Controller
             $imgs = [];
             foreach($pictures as $key => $picture){
                 $file = Resources::where('id' , $picture)->first();
-                if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
-                    $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                if($file != null) {
+                    if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
+                        $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                    }
                 }
             }
             $Post->images = $imgs;
         }
-        $data = [
-            'post' => $Post
-        ];
-        return view('web.v1.admin.article.admin.intro',$data);
+        if($Post->single == '0'){
+            $trueContents = [];
+            if($Post->Contents->count() > 0){
+                foreach($Post->Contents as $content){
+                    if($content->picture != null){
+                        $file = Resources::where('id' , $content->picture)->first();
+                        if($file != null) {
+                            if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
+                                $tmp['image'] = parent::ResourcePath($file->path,$file->filename);
+                            }
+                        }
+                    }
+                    $tmp['content'] = $content->content;
+                    $trueContents[] = $tmp;
+                }
+            }
+            $Post->contents = $trueContents;
+            $data = [
+                'post' => $Post
+            ];
+            return view('web.v1.admin.article.intro-tm',$data);
+        }else{
+            $data = [
+                'post' => $Post
+            ];
+            return view('web.v1.admin.article.intro',$data);
+        }
     }
 
     /**
@@ -181,7 +206,7 @@ class PostsController extends Controller
             return parent::ajaxError('操作异常，请刷新重试');
         }
         $ids = explode(",",$request->input('ids'));
-        $deleteRows = Posts::whereIn('post_id',$ids)->delete();
+        $deleteRows = Posts::withTrashed()->whereIn('post_id',$ids)->forceDelete();
         return parent::ajaxSuccess($deleteRows);
     }
     /**
@@ -194,11 +219,11 @@ class PostsController extends Controller
         if(!$request->has('post_id')){
             return parent::ajaxError('操作异常，请刷新重试');
         }
-        $deleteRows = Posts::where('post_id',$request->input('post_id'))->delete();
+        $deleteRows = Posts::withTrashed()->where('post_id',$request->input('post_id'))->forceDelete();
         return parent::ajaxSuccess($deleteRows);
     }
     /**
-     * 批量启用文章
+     * 批量通过审核
      *
      * @param type var Description
      **/
@@ -208,12 +233,12 @@ class PostsController extends Controller
             return parent::ajaxError('操作异常，请刷新重试');
         }
         $ids = explode(",",$request->input('ids'));
-        $enableRows = Posts::whereIn('post_id',$ids)->update(['status'=>true]);
-        $updateRows = PostRelation::whereIn('post_id',$ids)->update(['status'=>true]);
+        $enableRows = Posts::withTrashed()->whereIn('post_id',$ids)->update(['status'=>true]);
+        $updateRows = PostRelation::withTrashed()->whereIn('post_id',$ids)->update(['status'=>true]);
         return parent::ajaxSuccess($enableRows);
     }
     /**
-     * 批量禁用文章
+     * 批量拒绝审核
      *
      * @param type var Description
      **/
@@ -223,12 +248,12 @@ class PostsController extends Controller
             return parent::ajaxError('操作异常，请刷新重试');
         }
         $ids = explode(",",$request->input('ids'));
-        $enableRows = Posts::whereIn('post_id',$ids)->update(['status'=>false]);
-        $updateRows = PostRelation::whereIn('post_id',$ids)->update(['status'=>false]);
+        $enableRows = Posts::withTrashed()->whereIn('post_id',$ids)->update(['status'=>false]);
+        $updateRows = PostRelation::withTrashed()->whereIn('post_id',$ids)->update(['status'=>false]);
         return parent::ajaxSuccess($enableRows);
     }
     /**
-     * 解禁文章
+     * 通过审核
      *
      * @param type var Description
      **/
@@ -240,16 +265,16 @@ class PostsController extends Controller
         $where = [
             'post_id' => $request->input('post_id')
         ];
-        $Post = Posts::where($where)->first();
+        $Post = Posts::withTrashed()->where($where)->first();
         if(!$Post){
             return parent::ajaxError('文章不存在');
         }
-        $UnbanRows = Posts::where('post_id',$Post->post_id)->update(['status'=>true]);
-        $updateRows = PostRelation::where('post_id',$Post->post_id)->update(['status'=>true]);
+        $UnbanRows = Posts::withTrashed()->where('post_id',$Post->post_id)->update(['status'=>true]);
+        $updateRows = PostRelation::withTrashed()->where('post_id',$Post->post_id)->update(['status'=>true]);
         return parent::ajaxSuccess($UnbanRows);
     }
     /**
-     * 屏蔽文章
+     * 拒绝审核
      *
      * @param type var Description
      **/
@@ -261,12 +286,12 @@ class PostsController extends Controller
         $where = [
             'post_id' => $request->input('post_id')
         ];
-        $Post = Posts::where($where)->first();
+        $Post = Posts::withTrashed()->where($where)->first();
         if(!$Post){
             return parent::ajaxError('文章不存在');
         }
-        $UnbanRows = Posts::where('post_id',$Post->post_id)->update(['status'=>false]);
-        $updateRows = PostRelation::where('post_id',$Post->post_id)->update(['status'=>false]);
+        $UnbanRows = Posts::withTrashed()->where('post_id',$Post->post_id)->update(['status'=>false]);
+        $updateRows = PostRelation::withTrashed()->where('post_id',$Post->post_id)->update(['status'=>false]);
         return parent::ajaxSuccess($UnbanRows);
     }
     /**
@@ -280,8 +305,8 @@ class PostsController extends Controller
             return parent::ajaxError('操作异常，请刷新重试');
         }
         $ids = explode(",",$request->input('ids'));
-        $enableRows = Posts::whereIn('post_id',$ids)->update(['show'=>true]);
-        $updateRows = PostRelation::whereIn('post_id',$ids)->update(['show'=>true]);
+        $enableRows = Posts::withTrashed()->whereIn('post_id',$ids)->update(['show'=>true]);
+        $updateRows = PostRelation::withTrashed()->whereIn('post_id',$ids)->update(['show'=>true]);
         return parent::ajaxSuccess($enableRows);
     }
     /**
@@ -295,8 +320,8 @@ class PostsController extends Controller
             return parent::ajaxError('操作异常，请刷新重试');
         }
         $ids = explode(",",$request->input('ids'));
-        $enableRows = Posts::whereIn('post_id',$ids)->update(['show'=>false]);
-        $updateRows = PostRelation::whereIn('post_id',$ids)->update(['show'=>false]);
+        $enableRows = Posts::withTrashed()->whereIn('post_id',$ids)->update(['show'=>false]);
+        $updateRows = PostRelation::withTrashed()->whereIn('post_id',$ids)->update(['show'=>false]);
         return parent::ajaxSuccess($enableRows);
     }
     /**
@@ -312,12 +337,12 @@ class PostsController extends Controller
         $where = [
             'post_id' => $request->input('post_id')
         ];
-        $Post = Posts::where($where)->first();
+        $Post = Posts::withTrashed()->where($where)->first();
         if(!$Post){
             return parent::ajaxError('文章不存在');
         }
-        $enableRows = Posts::where('post_id',$Post->post_id)->update(['show'=>true]);
-        $updateRows = PostRelation::where('post_id',$Post->post_id)->update(['show'=>true]);
+        $enableRows = Posts::withTrashed()->where('post_id',$Post->post_id)->update(['show'=>true]);
+        $updateRows = PostRelation::withTrashed()->where('post_id',$Post->post_id)->update(['show'=>true]);
         return parent::ajaxSuccess($enableRows);
     }
     /**
@@ -333,20 +358,35 @@ class PostsController extends Controller
         $where = [
             'post_id' => $request->input('post_id')
         ];
-        $Post = Posts::where($where)->first();
+        $Post = Posts::withTrashed()->where($where)->first();
         if(!$Post){
             return parent::ajaxError('文章不存在');
         }
-        $enableRows = Posts::where('post_id',$Post->post_id)->update(['show'=>false]);
-        $updateRows = PostRelation::where('post_id',$Post->post_id)->update(['show'=>false]);
+        $enableRows = Posts::withTrashed()->where('post_id',$Post->post_id)->update(['show'=>false]);
+        $updateRows = PostRelation::withTrashed()->where('post_id',$Post->post_id)->update(['show'=>false]);
         return parent::ajaxSuccess($enableRows);
     }
     /**
-     * 置顶
+     * 批量恢复
      *
      * @param type var Description
      **/
-    public function doUp(Request $request)
+    public function doRestores(Request $request)
+    {
+        if(!$request->has('ids')){
+            return parent::ajaxError('操作异常，请刷新重试');
+        }
+        $ids = explode(",",$request->input('ids'));
+        $restoreRows = Posts::withTrashed()->whereIn('post_id',$ids)->restore();
+        $updateRows = PostRelation::withTrashed()->whereIn('post_id',$ids)->restore();
+        return parent::ajaxSuccess($restoreRows);
+    }  
+    /**
+     * 恢复
+     *
+     * @param type var Description
+     **/
+    public function doRestore(Request $request)
     {
         if(!$request->has('post_id')){
             return parent::ajaxError('操作异常，请刷新重试');
@@ -354,16 +394,13 @@ class PostsController extends Controller
         $where = [
             'post_id' => $request->input('post_id')
         ];
-        $Post = Posts::where($where)->first();
+        $Post = Posts::withTrashed()->where($where)->first();
         if(!$Post){
             return parent::ajaxError('文章不存在');
         }
-        $Post->top_time = time();
-        if(!$Post->save()){
-            return parent::ajaxError('服务器异常，请稍后重试');
-        }else{
-            return parent::ajaxSuccess('操作成功');
-        }
+        $restoreRows = Posts::withTrashed()->where('post_id',$Post->post_id)->restore();
+        $updateRows = PostRelation::withTrashed()->where('post_id',$Post->post_id)->restore();
+        return parent::ajaxSuccess($restoreRows);
     }    
     /**
      * 文章分类列表

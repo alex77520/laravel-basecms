@@ -22,7 +22,6 @@ class CreateTbNoticesRelationTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-
             // 用户外键
             $table->foreign('uid')
                   ->references('uid')->on('tb_users')

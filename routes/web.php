@@ -75,6 +75,8 @@ Route::group(['middleware'=>'checkLogin','prefix'=>'admin'], function(){
     Route::post('/posts/enables','web\PostsController@doEnablePosts')->name('/admin/posts/enables')->middleware('checkRole:PostDisables');
     Route::post('/posts/disable','web\PostsController@doDisablePost')->name('/admin/posts/disable')->middleware('checkRole:PostDisable');
     Route::post('/posts/disables','web\PostsController@doDisablePosts')->name('/admin/posts/disables')->middleware('checkRole:PostDisables');
+    Route::post('/posts/restore','web\PostsController@doRestore')->name('/admin/posts/restore')->middleware('checkRole:PostRestore');
+    Route::post('/posts/restores','web\PostsController@doRestores')->name('/admin/posts/restores')->middleware('checkRole:PostRestores');
     Route::post('/posts/up','web\PostsController@doUp')->name('/admin/posts/up')->middleware('checkRole:PostUp');
     
     # 站内信

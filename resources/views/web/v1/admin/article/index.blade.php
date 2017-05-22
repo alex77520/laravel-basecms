@@ -101,6 +101,7 @@
                                         <th>信息来源</th>
                                         <th>分类</th>
                                         <th>显示</th>
+                                        <th>状态</th>
                                         <th>类型</th>
                                         <th>置顶</th>
                                         <th>创建时间</th>
@@ -113,7 +114,7 @@
                                     <td>
                                         <input type="checkbox" value="{{$post->post_id}}" name="ids[]">
                                     </td>
-                                    <td>{{ $post->title }}</td>
+                                    <td><a href="{{ route('/admin/article/intro',['post_id'=>$post->post_id]) }}" data-toggle="modal" data-target="#commonModal-lg" >{{ $post->title }}</a></td>
                                     <td>{{ $post->source }}</td>
                                     <td>
                                         @foreach($post->ClassifyRelation as $key=>$relation)
@@ -129,6 +130,13 @@
                                             <span class="text-success">显示</span>
                                         @else
                                             <span class="text-warning">隐藏</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ( $post->status == '1' )
+                                            <span class="text-success">审核通过</span>
+                                        @else
+                                            <span class="text-warning">待审核</span>
                                         @endif
                                     </td>
                                     <td>
@@ -164,7 +172,7 @@
                                                 <i class="mdi mdi-hc-lg mdi-settings"></i>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a href="{{ route('/admin/article/intro',['post_id'=>$post->post_id]) }}" data-toggle="modal" data-target="#commonModal" >详细信息</a></li>
+                                                <li><a href="{{ route('/admin/article/intro',['post_id'=>$post->post_id]) }}" data-toggle="modal" data-target="#commonModal-lg" >详细信息</a></li>
                                                 @if ($post->single != '1')
                                                 <li><a href="{{ route('/admin/article/image-text/item',['post_id'=>$post->post_id]) }}">条目管理</a></li>
                                                 @endif

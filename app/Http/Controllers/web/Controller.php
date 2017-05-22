@@ -205,6 +205,8 @@ class Controller extends BaseController
                     'PostBans' => '屏蔽/解除屏蔽(批量)',
                     'PostDelete' => '删除',
                     'PostDelete' => '删除(批量)',
+                    'PostRestore' => '恢复',
+                    'PostRestores' => '恢复(批量)',
                 ]
             ],
             'MsgMan' => [

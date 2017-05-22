@@ -26,7 +26,7 @@
     <span id="markdown-true-text" style="display:none;">{{$post->Content->content}}</span>
     <p id="markdown-text"></p>
    @else 
-    <p>{!! $post->Content->content !!}</p>
+    <p>{{ $post->Content->content }}</p>
    @endif
    <p>
     标签：
@@ -40,8 +40,8 @@
    </p>
 </div>
 @if ($post->markdown == '1')
+<script src="https://cdn.bootcss.com/marked/0.3.6/marked.js"></script>
 <script>
-    var content = $('#markdown-true-text').text();
-    $('#markdown-text').html(marked(content));
+    $('#markdown-text').marked($('#markdown-true-text').text());
 </script>
 @endif

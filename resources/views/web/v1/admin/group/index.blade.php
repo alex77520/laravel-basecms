@@ -25,7 +25,7 @@
 								<th>状态</th>
 								<th>发文审核</th>
 								<th>员工数(现有/最大)</th>
-								<th>资源可用(MB)</th>
+								{{-- <th>资源可用(MB)</th> --}}
 								<th>操作</th>
 							</tr>
 							@foreach ($groups as $group)
@@ -56,7 +56,7 @@
                                     @endif
                                 </td>
 								<td>{{ $group->GroupUsers->count() ."/". $group->user_num }}</td>
-								<td>{{ $group->resource_size }}</td>
+								{{-- <td>{{ $group->resource_size }}</td> --}}
 								<td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

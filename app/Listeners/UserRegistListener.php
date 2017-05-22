@@ -37,6 +37,9 @@ class UserRegistListener
         $Groups->uid = $User->uid;
         $Groups->name = $User->account."的分组";
         $Groups->secret = str_random(78);
+        $Groups->resource_size = 200;
+        $Groups->post_audit = true;
+        $Groups->user_num = 5;
         $initResult = $Groups->save();
         if(!$initResult){
             Log::error('初始化用户'.$User->account.'时，创建分组失败',['uid'=>$User->uid]);

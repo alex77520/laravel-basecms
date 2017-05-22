@@ -1615,7 +1615,7 @@ ul, ol {
   padding-left: 0; }
 
 code {
-  border: 1px solid #35b8e0;
+  /*border: 1px solid #35b8e0;*/
   background: #eff9fc;
   color: #35b8e0;
   border-radius: 3px; }

@@ -111,6 +111,7 @@
                         },
                     }
                 },
+                /*
                 image: {
                     message: '请选择图片',
                     validators: {
@@ -119,6 +120,7 @@
                         },
                     }
                 },
+                */
                 sort: {
                     message: '排序不合法',
                     validators: {

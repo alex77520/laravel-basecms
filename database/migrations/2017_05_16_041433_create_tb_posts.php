@@ -24,13 +24,15 @@ class CreateTbPosts extends Migration
             $table->integer('hit')->default(0)->comment('点击量');
             $table->integer('top_time')->default(0)->comment('置顶时间');
             $table->string('tags')->nullable()->comment('标签列表，用逗号隔开');
-            $table->boolean('status')->default(true)->comment('超管操作的禁止标志,默认不禁止');
+            $table->boolean('status')->default(true)->comment('审核状态，默认不审核');
             $table->integer('likes')->default(0)->comment('得到的赞数量');
             $table->integer('comments')->default(0)->comment('得到的评论数');
             $table->integer('stars')->default(0)->comment('得到的收藏数');
             $table->integer('interval')->default(0)->comment('定时发布时间，0为不定时');
             $table->string('gid')->comment('发布人的分组');
             $table->timestamps();
+            $table->softDeletes();
+
 
             // 分组外键
             $table->foreign('gid')

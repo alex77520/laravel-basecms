@@ -103,20 +103,23 @@ class GroupController extends Controller
         if(!$request->has('gid')){
             return parent::ajaxError('操作异常，请刷新重试');
         }
-        if(!$request->has('size')){
-            return parent::ajaxError('资源可用量必须设置');
-        }
+        // if(!$request->has('size')){
+        //     return parent::ajaxError('资源可用量必须设置');
+        // }
         if(!$request->has('user_num')){
             return parent::ajaxError('员工数量必须设置');
         }
-        if(!is_numeric($request->input('size')) || !is_numeric($request->input('user_num'))){
+        // if(!is_numeric($request->input('size')) || !is_numeric($request->input('user_num'))){
+        //     return parent::ajaxError('请输入正确的数字');
+        // }
+        if(!is_numeric($request->input('user_num'))){
             return parent::ajaxError('请输入正确的数字');
         }
         $Group = Groups::where('gid',$request->input('gid'))->first();
         if(!$Group){
             return parent::ajaxError('机构不存在');
         }
-        $Group->resource_size = $request->input('size');
+        // $Group->resource_size = $request->input('size');
         $Group->user_num = $request->input('user_num');
         if(!$Group->save()){
             return parent::ajaxError('服务器异常，请稍后重试');

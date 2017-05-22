@@ -21,6 +21,7 @@ class CreateTbPostsRelation extends Migration
             $table->boolean('status')->default(true)->comment('同步文章的禁用/启用');
             $table->integer('top_time')->default(0)->comment('置顶时间');
             $table->timestamps();
+            $table->softDeletes();
 
             // 文章分类外键
             $table->foreign('pc_id')

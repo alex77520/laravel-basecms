@@ -22,12 +22,21 @@
         @endforeach
     @endif
    </p>
-   @if ($post->markdown == '1')
-    <span id="markdown-true-text" style="display:none;">{{$post->Content->content}}</span>
-    <p id="markdown-text"></p>
-   @else 
-    <p>{!! $post->Content->content !!}</p>
-   @endif
+   <p>
+    @if(count($post->contents) > 0)
+        @foreach ($post->contents as $content)
+            @if (isset($content['image']))
+            <div class="avatar avatar-lg">
+                <a href="{{ $content['image'] }}" data-lightbox="gallery-2" data-title="">
+                    <img class="img-responsive" src="{{ $content['image'] }}" >
+                </a>
+            </div>
+            @endif
+            {{ $content['content'] }}
+            <hr />
+        @endforeach
+    @endif
+   </p>
    <p>
     标签：
     @if($post->tags != null)
@@ -39,9 +48,3 @@
     @endif
    </p>
 </div>
-@if ($post->markdown == '1')
-<script>
-    var content = $('#markdown-true-text').text();
-    $('#markdown-text').html(marked(content));
-</script>
-@endif

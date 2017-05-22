@@ -97,18 +97,21 @@
 						<div class="m-b-lg">
 							<div class="btn-group" role="group">
 							@if ($controller->HasLimit('PostBans') !== false)
-								<a href="javascript:unban();" class="btn btn-default"><i class="mdi mdi-eye"></i> 恢复</a>
-								<a href="javascript:ban();" class="btn btn-default"><i class="mdi mdi-eye-off"></i> 屏蔽</a>
+								<a href="javascript:unban();" class="btn btn-success">通过审核</a>
+								<a href="javascript:ban();" class="btn btn-danger">屏蔽</a>
 							@endif
 							</div>
 							<div class="btn-group" role="group">
-							@if ($controller->HasLimit('PostDisables') !== false)
-								<a href="javascript:enable();" class="btn btn-default"><i class="mdi mdi-eye"></i> 启用</a>
-								<a href="javascript:disable();" class="btn btn-default"><i class="mdi mdi-eye-off"></i> 隐藏</a>
-                            @endif
+                                @if ($controller->HasLimit('PostDisables') !== false)
+                                    <a href="javascript:enable();" class="btn btn-default"><i class="mdi mdi-eye"></i> 启用</a>
+                                    <a href="javascript:disable();" class="btn btn-default"><i class="mdi mdi-eye-off"></i> 隐藏</a>
+                                @endif
 							</div>
+							@if ($controller->HasLimit('PostRestores') !== false)
+                                <a href="javascript:restore();" class="btn btn-primary"><i class="mdi mdi-delete"></i> 恢复</a>
+                            @endif
 							@if ($controller->HasLimit('PostDels') !== false)
-							<a href="javascript:del();" class="btn btn-danger"><i class="mdi mdi-delete"></i> 删除</a>
+                                <a href="javascript:del();" class="btn btn-danger"><i class="mdi mdi-delete"></i> 删除</a>
                             @endif
 						</div>
 					</div>
@@ -127,8 +130,8 @@
                                         <th>标题</th>
                                         <th>信息来源</th>
                                         <th>分类</th>
-                                        <th>显示</th>
-                                        <th>状态</th>
+                                        <th>显示/状态</th>
+                                        <th>删除</th>
                                         <th>类型</th>
                                         <th>置顶</th>
                                         <th>创建时间</th>
@@ -141,7 +144,7 @@
                                     <td>
                                         <input type="checkbox" value="{{$post->post_id}}" name="ids[]">
                                     </td>
-                                    <td>{{ $post->title }}</td>
+                                    <td><a href="{{ route('/admin/posts/intro',['post_id'=>$post->post_id]) }}" data-toggle="modal" data-target="#commonModal-lg" >{{ $post->title }}</a></td>
                                     <td>{{ $post->source }}</td>
                                     <td>
                                         @foreach($post->ClassifyRelation as $key=>$relation)
@@ -156,14 +159,20 @@
                                         @if ( $post->show == '1' )
                                             <span class="text-success">显示</span>
                                         @else
-                                            <span class="text-danger">隐藏</span>
+                                            <span class="text-warning">隐藏</span>
+                                        @endif
+                                        /
+                                        @if ( $post->status == '1' )
+                                            <span class="text-success">通过</span>
+                                        @else
+                                            <span class="text-warning">待审核</span>
                                         @endif
                                     </td>
                                     <td>
-                                        @if ( $post->status == '1' )
+                                        @if ( $post->deleted_at == null )
                                             <span class="text-success">正常</span>
                                         @else
-                                            <span class="text-warning">屏蔽</span>
+                                            <span class="text-danger">已删除</span>
                                         @endif
                                     </td>
                                     <td>
@@ -194,22 +203,12 @@
                                     </td>
                                     <td>{{ $post->created_at }}</td>
                                     <td>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                置顶 <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="javascript:doUp('{{$post->post_id}}','2')">首页置顶</a></li>
-                                                <li><a href="javascript:doUp('{{$post->post_id}}','1')">分类置顶</a></li>
-                                                <li><a href="javascript:doUp('{{$post->post_id}}','3')">首页+分类置顶</a></li>
-                                            </ul>
-                                        </div>
                                         <div class="btn-group dropup">
                                             <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <i class="mdi mdi-hc-lg mdi-settings"></i>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a href="{{ route('/admin/posts/intro',['post_id'=>$post->post_id]) }}" data-toggle="modal" data-target="#commonModal" >详细信息</a></li>
+                                                <li><a href="{{ route('/admin/posts/intro',['post_id'=>$post->post_id]) }}" data-toggle="modal" data-target="#commonModal-lg" >详细信息</a></li>
                                                 @if ($controller->HasLimit('PostDisable') !== false)
                                                 <li>
                                                     @if($post->show == '1')
@@ -224,13 +223,18 @@
                                                     @if($post->status == '1')
                                                         <a href="javascript:doBan('{{$post->post_id}}')" class="text-warning">屏蔽</a>
                                                     @else 
-                                                        <a href="javascript:doUnban('{{$post->post_id}}')" class="text-info">解除屏蔽</a>
+                                                        <a href="javascript:doUnban('{{$post->post_id}}')" class="text-info">通过审核</a>
                                                     @endif
+                                                </li>
+                                                @endif
+                                                @if ($controller->HasLimit('PostRestore') !== false)
+                                                <li>
+                                                    <a href="javascript:doRestore('{{$post->post_id}}')" class="text-danger">恢复</a>
                                                 </li>
                                                 @endif
                                                 @if ($controller->HasLimit('PostDel') !== false)
                                                 <li>
-                                                    <a href="javascript:doDel('{{$post->post_id}}')" class="text-danger">删除</a>
+                                                    <a href="javascript:doDel('{{$post->post_id}}')" class="text-danger">永久删除</a>
                                                 </li>
                                                 @endif
                                             </ul>
@@ -250,6 +254,31 @@
 
 @section('js')
 <script>
+function doRestore(id){
+    $.confirm({
+        content:"您确定要恢复该文章吗？",
+        confirm:function(){
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.post("{{ route('/admin/posts/restore')}}",{post_id:id},function(data){
+                if(data.code == '1'){
+                    $.alert({
+                        content:'成功恢复 '+data.data+' 条记录',
+                        cofirmButtonClass:"btn-success",
+                        confirm:function(){
+                            window.location.reload();
+                        }
+                    });
+                }else{
+                    $.alert(data.data);
+                }
+            },'json');
+        }
+    })
+}
 function doDel(id){
     $.confirm({
         content:"您确定要删除该文章？",
@@ -321,7 +350,7 @@ function doDisable(id){
 }
 function doUnban(id){
     $.confirm({
-        content:"您确定要将该文章“解除屏蔽”吗？",
+        content:"您确定要将该文章“通过审核”吗？",
         confirm:function(){
             $.ajaxSetup({
                 headers: {
@@ -363,32 +392,37 @@ function doBan(id){
         }
     })
 }
-function doUp(id,type = 0){
-    var str = "";
-    if(type == '1'){
-        str = '您确定要将该文章于“分类”中置顶吗？';
-    }else if(type == '2'){
-        str = '您确定要将该文章置顶吗？';
-    }else if(type == '3'){
-        str = '您确定要将该文章于“所有地方”置顶吗？';
-    }else{
-        Toast('错误：请刷新重试');
+function restore(){
+    var cnt = 0;
+    var ids = "";
+    $("input[name='ids[]']").each(function(){
+        if($(this).is(':checked')){
+            ids += $(this).val()+",";
+            cnt++;
+        }
+    });
+    if(cnt <= 0){
+        Toast('未选中数据');
         return;
     }
+    //提交
     $.confirm({
-        content:str,
+        content:"你确定要恢复这 "+cnt+" 条数据吗？",
         confirm:function(){
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $.post("{{ route('/admin/posts/up')}}",{post_id:id,type:type},function(data){
+            $.post("{{ route('/admin/posts/restores')}}",{ids:ids},function(data){
                 if(data.code == '1'){
-                    Toast('设置成功');
-                    setTimeout(function(){
-                        window.location.reload();
-                    },1200);
+                    $.alert({
+                        content:'成功恢复 '+data.data+' 条记录',
+                        cofirmButtonClass:"btn-success",
+                        confirm:function(){
+                            window.location.reload();
+                        }
+                    });
                 }else{
                     $.alert(data.data);
                 }
@@ -519,7 +553,7 @@ function unban(){
     }
     //提交
     $.confirm({
-        content:"你确定要将这 "+cnt+" 条数据“解除屏蔽”吗？",
+        content:"你确定要将这 "+cnt+" 条数据“通过审核”吗？",
         confirm:function(){
             $.ajaxSetup({
                 headers: {

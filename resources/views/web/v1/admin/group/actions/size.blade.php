@@ -10,10 +10,10 @@
             <label for="">员工数量：</label>
             <input name="user_num" type="number" class="form-control" placeholder="名称" value="{{ $group->user_num }}" >
         </div>
-        <div class="form-group">
+        {{-- <div class="form-group">
             <label for="">资源总大小(MB)：</label>
             <input name="size" type="number" class="form-control" placeholder="资源总大小" value="{{ $group->resource_size }}" >
-        </div>
+        </div> --}}
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-success"><i class="fa fa-save"></i>  保存</button>
@@ -37,6 +37,7 @@ $(function(){
                     },
                 }
             },
+            /*
             size: {
                 message: '资源可用量不合法',
                 validators: {
@@ -45,6 +46,7 @@ $(function(){
                     },
                 }
             },
+            */
         }
     }).on('success.form.bv', function(e) {
         e.preventDefault();

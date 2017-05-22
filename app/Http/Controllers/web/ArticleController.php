@@ -26,7 +26,7 @@ class ArticleController extends Controller
      **/
     public function index(Request $request)
     {
-        $where = ['gid' => self::$user['gid'],'status'=>true]; # 查询的条件
+        $where = ['gid' => self::$user['gid']]; # 查询的条件
         $key = null; # 存储搜索KEY的条件，因为要匹配3个不同字段，所以要用or
         $post_ids = []; # 存储属于这个分类下的所有文章ID
         $search = []; # 存储搜索的条件，用于展示
@@ -130,27 +130,52 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true
         ];
         $Post = Posts::where($where)->first();
         if(!$Post){
             return parent::_error('文章不存在','modal');
         }
+        
         if($Post->cover != null){
             $pictures = explode(",",$Post->cover);
             $imgs = [];
             foreach($pictures as $key => $picture){
                 $file = Resources::where('id' , $picture)->first();
-                if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
-                    $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                if($file != null) {
+                    if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
+                        $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                    }
                 }
             }
             $Post->images = $imgs;
         }
-        $data = [
-            'post' => $Post
-        ];
-        return view('web.v1.admin.article.intro',$data);
+        if($Post->single == '0'){
+            $trueContents = [];
+            if($Post->Contents->count() > 0){
+                foreach($Post->Contents as $content){
+                    if($content->picture != null){
+                        $file = Resources::where('id' , $content->picture)->first();
+                        if($file != null) {
+                            if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
+                                $tmp['image'] = parent::ResourcePath($file->path,$file->filename);
+                            }
+                        }
+                    }
+                    $tmp['content'] = $content->content;
+                    $trueContents[] = $tmp;
+                }
+            }
+            $Post->contents = $trueContents;
+            $data = [
+                'post' => $Post
+            ];
+            return view('web.v1.admin.article.intro-tm',$data);
+        }else{
+            $data = [
+                'post' => $Post
+            ];
+            return view('web.v1.admin.article.intro',$data);
+        }
     }
     /**
      * 选择发布类型
@@ -210,6 +235,7 @@ class ArticleController extends Controller
             $Post->interval = 0;
         }
         $Post->gid = self::$user['gid'];
+        $Post->status = self::canRelease();
         $postRs = $Post->save();
         if(!$postRs){
             return parent::ajaxError('服务器异常，请稍后重试');
@@ -261,7 +287,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => true
         ];
         $Post = Posts::where($where)->first();
@@ -305,7 +330,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => true
         ];
         $Post = Posts::where($where)->first();
@@ -337,6 +361,7 @@ class ArticleController extends Controller
         }else{
             $Post->interval = 0;
         }
+        $Post->status = self::canRelease();
         $postRs = $Post->save();
         if(!$postRs){
             return parent::ajaxError('服务器异常，请稍后重试');
@@ -423,6 +448,7 @@ class ArticleController extends Controller
             $Post->interval = 0;
         }
         $Post->gid = self::$user['gid'];
+        $Post->status = self::canRelease();
         $postRs = $Post->save();
         if(!$postRs){
             return parent::ajaxError('服务器异常，请稍后重试');
@@ -475,7 +501,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => true,
             'markdown' => true
         ];
@@ -521,7 +546,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => true,
             'markdown' => true
         ];
@@ -555,6 +579,7 @@ class ArticleController extends Controller
         }else{
             $Post->interval = 0;
         }
+        $Post->status = self::canRelease();
         $postRs = $Post->save();
         if(!$postRs){
             return parent::ajaxError('服务器异常，请稍后重试');
@@ -637,6 +662,7 @@ class ArticleController extends Controller
             $Post->interval = 0;
         }
         $Post->gid = self::$user['gid'];
+        $Post->status = self::canRelease();
         $postRs = $Post->save();
         if(!$postRs){
             return parent::ajaxError('服务器异常，请稍后重试');
@@ -681,7 +707,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -726,7 +751,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -759,6 +783,7 @@ class ArticleController extends Controller
         }else{
             $Post->interval = 0;
         }
+        $Post->status = self::canRelease();
         $postRs = $Post->save();
         if(!$postRs){
             return parent::ajaxError('服务器异常，请稍后重试');
@@ -803,8 +828,8 @@ class ArticleController extends Controller
                 $trueIds[] = $Post->post_id;
             }
         }
-        $deleteRows = Posts::whereIn('post_id',$trueIds)->update(['status'=>false]);
-        $updateRows = PostRelation::whereIn('post_id',$trueIds)->update(['status'=>false]);
+        $deleteRows = Posts::whereIn('post_id',$trueIds)->delete();
+        $updateRows = PostRelation::whereIn('post_id',$trueIds)->delete();
         parent::GroupLogger('delete',implode(',',$trueIds),"ID:{".implode(',',$trueIds)."}","POSTS");
         return parent::ajaxSuccess($deleteRows);
     }
@@ -821,14 +846,13 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
         ];
         $Post = Posts::where($where)->first();
         if(!$Post){
             return parent::ajaxError('文章不存在');
         }
-        $deleteRows = Posts::where('post_id',$Post->post_id)->where('gid',self::$user['gid'])->update(['status'=>false]);
-        $updateRows = PostRelation::where('post_id',$Post->post_id)->update(['status'=>false]);
+        $deleteRows = Posts::where('post_id',$Post->post_id)->where('gid',self::$user['gid'])->delete();
+        $updateRows = PostRelation::where('post_id',$Post->post_id)->delete();
         parent::GroupLogger('delete',$Post->post_id,"标题:".$Post->title,"POSTS");
         return parent::ajaxSuccess($deleteRows);
     }
@@ -891,7 +915,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
         ];
         $Post = Posts::where($where)->first();
         if(!$Post){
@@ -915,7 +938,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
         ];
         $Post = Posts::where($where)->first();
         if(!$Post){
@@ -942,7 +964,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -952,9 +973,11 @@ class ArticleController extends Controller
         $PostContents = PostContent::where('post_id' , $Post->post_id)->orderBy('sort','asc')->orderBy('created_at', 'desc')->get();
         if($PostContents){
             foreach($PostContents as $key => $PostContent){
-                if(isset($PostContent->picture)){
+                if($PostContent->picture != null){
                     $file = Resources::where('id' , $PostContent->picture)->first();
-                    $PostContents[$key]->picture = parent::ResourcePath($file->path,$file->filename);
+                    if($file != null){
+                        $PostContents[$key]->picture = parent::ResourcePath($file->path,$file->filename);
+                    }
                 }
             }
         }
@@ -978,7 +1001,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -988,9 +1010,11 @@ class ArticleController extends Controller
         $PostContents = PostContent::where('post_id' , $Post->post_id)->orderBy('sort','asc')->orderBy('created_at', 'desc')->get();
         if($PostContents){
             foreach($PostContents as $key => $PostContent){
-                if(isset($PostContent->picture)){
+                if($PostContent->picture != null){
                     $file = Resources::where('id' , $PostContent->picture)->first();
-                    $PostContents[$key]->picture = parent::ResourcePath($file->path,$file->filename);
+                    if($file != null){
+                        $PostContents[$key]->picture = parent::ResourcePath($file->path,$file->filename);
+                    }
                 }
             }
         }
@@ -1011,7 +1035,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -1022,9 +1045,11 @@ class ArticleController extends Controller
         if(!$PostContent){
             return parent::ajaxError('该条目不存在');
         }
-        if(isset($PostContent->picture)){
+        if($PostContent->picture != null){
             $file = Resources::where('id' , $PostContent->picture)->first();
-            $PostContent->image = parent::ResourcePath($file->path,$file->filename);
+            if($file != null){
+                $PostContent->image = parent::ResourcePath($file->path,$file->filename);
+            }
         }
         return parent::ajaxSuccess($PostContent);
     }
@@ -1041,7 +1066,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -1079,7 +1103,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -1110,7 +1133,6 @@ class ArticleController extends Controller
         $where = [
             'gid' => self::$user['gid'],
             'post_id' => $request->input('post_id'),
-            'status' => true,
             'single' => false
         ];
         $Post = Posts::where($where)->first();
@@ -1132,5 +1154,21 @@ class ArticleController extends Controller
             parent::GroupLogger('update',$Post->post_id,"标题:".$Post->title,"POSTS");
             return parent::ajaxSuccess('保存成功');
         }
+    }
+
+    /**
+     * 检验是否可以免审核发布文章
+     *
+     * @param type var Description
+     **/
+    public function canRelease(){
+        $Group = Groups::where('gid',self::$user['gid'])->first();
+        if($Group != null) {
+            # 不需要审核
+            if($Group->post_audit != '1'){
+                return true;
+            }
+        }
+        return false;
     }
 }
