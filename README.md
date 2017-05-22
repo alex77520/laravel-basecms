@@ -15,10 +15,12 @@ Laravel5.4 + PHP5.6 + MySQL5.5 + Redis
 
     composer install 
 
+    php artisan migrate
+
  ```
 
  在根目录下 `.env` 中配置数据库和Redis数据库连接信息
- 
+
 
 # 登录相关
 
@@ -86,3 +88,13 @@ Laravel5.4 + PHP5.6 + MySQL5.5 + Redis
 ### 轮播图(待开发)
 ### 网站配置(待开发)
 ### 首页(待开发，不知道要弄些啥)
+
+
+### 数据库字段信息
+
+##### -.- 其实这个是可以看 /database/migrations/* 
+
+其中 tb_msgs/tb_members/tb_member_token 这三个还没开发，只是创建了表
+
+### API文档( 不慌，只写了2个API，还写完  )
+ 
