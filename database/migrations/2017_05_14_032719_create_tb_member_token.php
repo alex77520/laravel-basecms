@@ -24,7 +24,7 @@ class CreateTbMemberToken extends Migration
             $table->string('access_token')->comment('通行证');
             $table->string('refresh_token')->comment('刷新通行证的凭证');
             $table->integer('expire')->default(0)->comment('有效时间');
-            $table->string('gid')->comment('分组ID');
+            $table->string('gid',100)->comment('分组ID');
             $table->timestamps();
             // 分组外键
             $table->foreign('gid')

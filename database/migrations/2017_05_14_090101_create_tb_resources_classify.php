@@ -17,7 +17,7 @@ class CreateTbResourcesClassify extends Migration
             $table->increments('id');
             $table->string('name')->comment('分类名称');
             $table->integer('sort')->default(0)->comment('排序');
-            $table->string('gid')->comment('所属分组');
+            $table->string('gid',100)->comment('所属分组');
             $table->timestamps();
 
             // 分组外键

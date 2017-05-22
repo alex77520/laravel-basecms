@@ -15,7 +15,7 @@ class CreateTbGroupsUser extends Migration
     {
         Schema::create('tb_groups_user', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('gid')->comment('小组ID');
+            $table->string('gid',100)->comment('小组ID');
             $table->integer('uid')->unsigned()->comment('用户ID');
             $table->timestamps();
 

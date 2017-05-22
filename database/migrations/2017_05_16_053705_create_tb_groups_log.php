@@ -20,7 +20,7 @@ class CreateTbGroupsLog extends Migration
             $table->enum('data_action',['0','1','2'])->default('0')->comment('操作:0增1改2删');
             $table->string('data_main')->comment('数据主要依据');
             $table->string('data_key')->comment('操作实体，来源于代码');
-            $table->string('gid')->comment('分组ID');
+            $table->string('gid',100)->comment('分组ID');
             $table->timestamps();
 
             // 分类外键

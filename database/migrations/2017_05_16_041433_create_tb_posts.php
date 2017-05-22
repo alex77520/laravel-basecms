@@ -29,7 +29,7 @@ class CreateTbPosts extends Migration
             $table->integer('comments')->default(0)->comment('得到的评论数');
             $table->integer('stars')->default(0)->comment('得到的收藏数');
             $table->integer('interval')->default(0)->comment('定时发布时间，0为不定时');
-            $table->string('gid')->comment('发布人的分组');
+            $table->string('gid',100)->comment('发布人的分组');
             $table->timestamps();
             $table->softDeletes();
 
