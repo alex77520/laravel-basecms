@@ -103,7 +103,6 @@
                                         <th>显示</th>
                                         <th>类型</th>
                                         <th>置顶</th>
-                                        <th>定时</th>
                                         <th>创建时间</th>
                                         <th>操作</th>
                                     </tr>
@@ -156,13 +155,6 @@
                                             @endif
                                         @else
                                             无
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($post->interval == 0)
-                                            否
-                                        @else
-                                        {{ date('m-d H:i',$post->interval) }}
                                         @endif
                                     </td>
                                     <td>{{ $post->created_at }}</td>

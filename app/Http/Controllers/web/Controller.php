@@ -73,6 +73,44 @@ class Controller extends BaseController
         }
     }
     /**
+     * 设置Cookie中的KEY获取用户信息
+     *
+     * @param type var Description
+     **/
+    public function setCookieUserInfo( $user, &$token)
+    {
+        $token = "cms_cookie_".(string)Uuid::generate();
+        // $User->ip = $request->getClientIp(); # 设置当前的IP
+        $UserInfo = [
+            'uid'  => $user->uid,
+            'account' => $user->account,
+            'password' => $user->password,
+        ]; 
+        # 存入redis数据库中
+        $rs = Redis::set($token , json_encode($UserInfo));
+        if($rs){
+            # 设置7天的过期时间
+            Redis::expire($token , 3600 * 24 * 7);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 获取Cookie中的KEY获取用户信息
+     *
+     * @param type var Description
+     **/
+    public function getCookieUserInfo($cookie)
+    {
+        $userInfo = Redis::get($cookie);
+        if(!$userInfo){
+            return false;
+        }else{
+            return json_decode($userInfo,true);
+        }
+    }
+    /**
      * 重置身份信息
      *
      * 用户信息变更后，进行身份信息的变更

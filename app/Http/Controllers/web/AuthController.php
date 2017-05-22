@@ -24,6 +24,7 @@ class AuthController extends Controller
         // 执行登录
         $username = $request->input('username');
         $password = $request->input('password');
+        $remember = $request->input('remember');
         
         $User = Users::where('account',$username)
                         ->where('power',true)
@@ -39,6 +40,12 @@ class AuthController extends Controller
         if(!$rs){
             return parent::ajaxError('服务器异常，请联系管理员');
         }
+        # 如果勾选了保持7天登录
+        if($remember === 'remember'){
+            parent::setCookieUserInfo($User,$cookieToken); # 设置自动登录7天
+            Cookie::queue('cms_autologin_key',$cookieToken,7*3600*24);
+        }
+
         # 设置SESSION
         $request->session()->put('ticket', $token);
         return parent::ajaxSuccess($token);
@@ -76,7 +83,39 @@ class AuthController extends Controller
      **/
     public function logout(Request $request){
         $request->session()->forget('ticket');
-        Cookie::queue('app.vcomer.cn_autologin_key',null,-1);
+        Cookie::queue('cms_autologin_key',null,-1);
         return redirect('/');
+    }
+    /**
+     * 自动登录
+     *
+     * @param type var Description
+     **/
+    public function autoLogin(Request $request){
+        $cookie = $request->cookie('cms_autologin_key');
+        $userInfo = false;
+        if(!$userInfo = parent::getCookieUserInfo($cookie)){
+            return parent::ajaxError('暂无启用自动登录');
+        }
+        $where = [
+            'account' => $userInfo['account'],
+            'power' => true
+        ];
+        $user = Users::where($where)->first();
+        if(!$user){
+            return parent::ajaxError('用户名或密码错误');
+        }
+        if($userInfo['password'] !== $user->password){
+            return parent::ajaxError('用户名或密码错误');
+        } 
+
+        # 存储缓存服务器
+        $rs = parent::setWebUserInfo($user,$token);
+        if(!$rs){
+            return parent::ajaxError('服务器异常，请联系管理员');
+        }
+        # 设置SESSION
+        $request->session()->put('ticket', $token);
+        return parent::ajaxSuccess($token);
     }
 }

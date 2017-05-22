@@ -19,6 +19,7 @@
         return view('web/v1/login');
     })->name('/login');
     Route::post('/login' , 'web\AuthController@login')->name('/login');
+    Route::post('/autologin' , 'web\AuthController@autoLogin')->name('/autologin');
 
     Route::get('/logout' , 'web\AuthController@logout')->name('/logout');
 
@@ -26,8 +27,6 @@
         return view('web/v1/regist');
     })->name('/regist');
     Route::post('/regist' , 'web\AuthController@regist')->name('/regist');
-
-    Route::post('/autologin' , 'web\AuthController@login')->name('/autologin');
 
 Route::group(['middleware'=>'checkLogin','prefix'=>'admin'], function(){
     #

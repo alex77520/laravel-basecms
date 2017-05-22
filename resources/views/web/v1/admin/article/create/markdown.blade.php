@@ -61,12 +61,12 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 col-xs-12 col-sm-6">
+                    {{-- <div class="col-md-6 col-xs-12 col-sm-6">
                         <div class="form-group">
                             <label for="interval">定时发布 <a href="javascript:clearIntervalTime();" id="clearIntervalTime" style="font-size:8px;display:none;">清除定时</a></label>
                             <input type="text" id="intervalTime" class="form-control" data-plugin="datetimepicker" placeholder="为空则指即时发布" name="interval">
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-md-6 col-xs-12 col-sm-6">
                         <div class="form-group">
                             <label for="show">是否可见<span class="text-danger">*</span></label>

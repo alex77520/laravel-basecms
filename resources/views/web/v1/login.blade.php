@@ -63,7 +63,6 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            /*
             $.post("{{ route('/autologin') }}",{id:'1'},function(data){
                 if(data.code == '1'){
                     @if(!Session::has('login_return'))
@@ -76,7 +75,6 @@
                     $("#login-form").show();
                 }
             });
-            */
             $(".autologin_text").hide();
             $("#login-form").show();
             $('#login-form').bootstrapValidator({

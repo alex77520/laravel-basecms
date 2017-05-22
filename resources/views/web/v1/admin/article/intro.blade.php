@@ -34,16 +34,4 @@
         无
     @endif
    </p>
-   <p>
-   定时发布：
-    @if ($post->interval != 0)
-            @if($post->interval < time())
-                已于 <b class="text-primary">{{ date('Y-m-d H:i',$post->interval)}} </b> 发布！
-            @else
-                将于 <b class="text-primary">{{ date('Y-m-d H:i',$post->interval)}}</b> 发布~
-            @endif
-    @else
-            即时发布
-    @endif
-   </p>
 </div>
