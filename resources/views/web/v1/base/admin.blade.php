@@ -59,21 +59,15 @@
 							</a>
 							<ul class="dropdown-menu animated flipInY">
 								<li>
-									<a class="text-color" href="../../index.html">
+									<a class="text-color" href="{{ route('/admin/ucenter/userinfo/edit') }}">
 										<span class="m-r-xs"><i class="mdi mdi-home"></i></span>
-										<span>首页</span>
+										<span>个人资料</span>
 									</a>
 								</li>
 								<li>
-									<a class="text-color" href="profile.html">
+									<a class="text-color" href="{{ route('/admin/ucenter/password') }}">
 										<span class="m-r-xs"><i class="mdi mdi-account"></i></span>
-										<span>个人主页</span>
-									</a>
-								</li>
-								<li>
-									<a class="text-color" href="settings.html">
-										<span class="m-r-xs"><i class="mdi mdi-settings"></i></span>
-										<span>设置</span>
+										<span>修改密码</span>
 									</a>
 								</li>
 								<li role="separator" class="divider"></li>
@@ -110,9 +104,6 @@
 						</a>
 						<ul class="submenu">
 							@if ($controller->HasLimit('GroupSee') !== false)
-								<li><a href="{{ route('/admin/group') }}">站点配置</a></li>
-							@endif
-							@if ($controller->HasLimit('GroupSee') !== false)
 								<li><a href="{{ route('/admin/group') }}">机构管理</a></li>
 							@endif
 							@if ($controller->HasLimit('UserSee') !== false)
@@ -120,12 +111,6 @@
 							@endif
 							@if ($controller->HasLimit('RoleSee') !== false)
 								<li><a href="{{ route('/admin/role') }}">角色管理</a></li>
-							@endif
-							@if ($controller->HasLimit('RoleSee') !== false)
-								<li><a href="{{ route('/admin/role') }}">会员管理</a></li>
-							@endif
-							@if ($controller->HasLimit('MsgSee') !== false)
-								<li><a href="{{ route('/admin/notice') }}">站内信</a></li>
 							@endif
 						</ul>
 					</li>
@@ -144,8 +129,8 @@
 							@if ($controller->HasLimit('PostSee') !== false)
 								<li><a href="{{ route('/admin/posts') }}">文章管理</a></li>
 							@endif
-							@if ($controller->HasLimit('SliderSee') !== false)
-								<li><a href="{{ route('/admin') }}">轮播图管理</a></li>
+							@if ($controller->HasLimit('MsgSee') !== false)
+								<li><a href="{{ route('/admin/notice') }}">站内信</a></li>
 							@endif
 						</ul>
 					</li>

@@ -224,7 +224,7 @@ class MsgController extends Controller
                     $level = '<span class="text-dark">[一般]</span>';
                     break;
             }
-            if($Notice->to == '1'){
+            if($Notice->Notice->to == '1'){
                 $to = '[站点]';
             }else{
                 $to = '[小组]';

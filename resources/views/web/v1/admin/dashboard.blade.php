@@ -3,7 +3,7 @@
 @section('container')
     @parent
     <section class="app-content">
-		<div class="row">
+		{{-- <div class="row">
 			<div class="col-md-6 col-sm-6">
 				<div class="widget p-md clearfix">
 					<div class="pull-left">
@@ -23,9 +23,9 @@
 					<span class="pull-right fz-lg fw-500 counter" data-plugin="counterUp">325</span>
 				</div><!-- .widget -->
 			</div>
-		</div><!-- .row -->
+		</div><!-- .row --> --}}
 
-		<div class="row">
+		{{-- <div class="row">
 			<div class="col-md-3 col-sm-6">
 				<div class="widget stats-widget">
 					<div class="widget-body clearfix">
@@ -89,103 +89,59 @@
 					</footer>
 				</div><!-- .widget -->
 			</div>
-		</div><!-- .row -->
-
+		</div><!-- .row --> --}}
 
 		<div class="row">
-			<div class="col-md-7">
-				<div class="widget">
-					<header class="widget-header">
-						<h4 class="widget-title">Active Leads</h4>
-					</header>
-					<hr class="widget-separator">
-					<div class="widget-body">
-						<div class="table-responsive">							
-							<table class="table no-cellborder">
-								<thead>
-									<tr><th>Type</th><th>Lead Name</th><th>Views</th><th>Favorites</th><th>Last Visit</th><th>Last Action</th></tr>
-								</thead>
-								<tbody>
-									<tr><td class="text-primary">Buyer</td><td>Denise Ann</td><td>150</td><td>150</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-									<tr><td class="text-primary">Buyer</td><td>Denise Ann</td><td>150</td><td>202</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-									<tr><td class="text-success">Landlord</td><td>Denise Ann</td><td>150</td><td>313</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-									<tr><td class="text-primary">Buyer</td><td>Denise Ann</td><td>150</td><td>175</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-									<tr><td class="text-danger">Seller</td><td>Denise Ann</td><td>150</td><td>148</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-									<tr><td class="text-primary">Buyer</td><td>Denise Ann</td><td>150</td><td>1500</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-									<tr><td class="text-primary">Buyer</td><td>Denise Ann</td><td>150</td><td>1270</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-									<tr><td class="text-danger">Buyer</td><td>Denise Ann</td><td>150</td><td>3201</td><td>9:23 AM</td><td><span class="table-icon fa fa-envelope"></span> 11/9/2015</td></tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div><!-- .widget -->
-			</div><!-- END column -->
-
-			<div class="col-md-5">
+			<div class="col-md-3">
+				欢迎您使用该系统
+			</div>
+		@if ($notices != null)
+			<div class="col-md-9">
 				<div class="widget todo-widget">
 					<header class="widget-header">
-						<h4 class="widget-title">Todo List</h4>
+						<h4 class="widget-title">最近通知</h4>
 					</header>
 					<hr class="widget-separator">
 					<div class="widget-body p-b-0">
 						<ul class="todo-list">
-							<li class="todo-item">
-								<div class="checkbox checkbox-default">
-									<input type="checkbox" id="checkbox02">
-									<label for="checkbox02">Record The First Episode Of HTML Tutorial</label>
-								</div>
-							</li><!-- .todo-item -->
+							@foreach ( $notices as $notice)
+								<li class="todo-item">
+									{{-- <div class="checkbox checkbox-default"> --}}
+										@if ($notice->Notice->to == '1')
+										<span class="text-dark">[站点]</span>
+										@else
+										<span class="text-dark">[小组]</span>
+										@endif
+										@if ($notice->Notice->level == '2')
+										<span class="text-primary">[重要]</span>
+										@elseif ($notice->Notice->level == '3')
+										<span class="text-danger">[紧急]</span>
+										@else
 
-							<li class="todo-item">
-								<div class="checkbox checkbox-pink">
-									<input type="checkbox" id="checkbox2">
-									<label for="checkbox2">Prepare The Conference Schedule</label>
-								</div>
-							</li><!-- .todo-item -->
-
-							<li class="todo-item">
-								<div class="checkbox checkbox-warning">
-									<input type="checkbox" id="checkbox4" checked="">
-									<label for="checkbox4">Decide The Live Discussion Time</label>
-								</div>
-							</li><!-- .todo-item -->
-
-							<li class="todo-item">
-								<div class="checkbox checkbox-success">
-									<input type="checkbox" id="checkbox3" checked="">
-									<label for="checkbox3">Prepare For The Next Project</label>
-								</div>
-							</li><!-- .todo-item -->
-
-							<li class="todo-item">
-								<div class="checkbox checkbox-danger">
-									<input type="checkbox" id="checkbox5" checked="">
-									<label for="checkbox5">Finish Up AngularJs Tutorial</label>
-								</div>
-							</li><!-- .todo-item -->
-
-							<li class="todo-item">
-								<div class="checkbox checkbox-purple">
-									<input type="checkbox" id="checkbox1" checked="">
-									<label for="checkbox1">Finish Infinity Project</label>
-								</div>
-							</li><!-- .todo-item -->
+										@endif
+										@if ( $notice->is_visit > 0)
+										<a href="{{route('/admin/msg/intro',['id'=>$notice->id])}}" class="text-dark" data-toggle="modal" data-target="#commonModal">{{$notice->Notice->title}}</a>
+										@else
+										<a href="{{route('/admin/msg/intro',['id'=>$notice->id])}}" class="text-primary" data-toggle="modal" data-target="#commonModal">{{$notice->Notice->title}}</a>
+										@endif
+									{{-- </div> --}}
+								</li><!-- .todo-item -->
+							@endforeach
 						</ul><!-- .todo-list -->
 					</div>
-					<div class="new-todo">
-						<input type="text" placeholder="add new task">
-					</div>
-					<footer class="widget-footer">
+					<hr />
+					{{-- <footer class="widget-footer">
 						<a href="javascript:void(0)" class="btn btn-sm btn-success m-r-md">All</a>
 						<a href="javascript:void(0)" class="btn btn-sm btn-default">Archive</a>
 						<a href="javascript:void(0)" class="btn btn-sm btn-default pull-right">Clear completed</a>
-					</footer>
+					</footer> --}}
 				</div><!-- .widget -->
 			</div>
+		@endif
 		</div><!-- .row -->
 
 
-		<div class="row">
+		{{-- <div class="row">
 			<div class="col-md-6 col-sm-6">
 				<div class="widget">
 					<header class="widget-header">
@@ -329,7 +285,7 @@
 					</div>
 				</div><!-- .widget -->
 			</div>
-		</div><!-- .row -->
+		</div><!-- .row --> --}}
 
 	</div></section>
 @stop

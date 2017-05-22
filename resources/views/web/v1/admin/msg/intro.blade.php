@@ -17,7 +17,12 @@
                     <div class="media">
                         <div class="media-left">
                             <div class="avatar avatar-sm avatar-circle">
+                                @if($notice->User->avatar == null)
+                                <img class="img-responsive" src="{{ URL::asset('/web/v1/assets/images/221.jpg') }}" alt="avatar"/>
+                                @else 
                                 <img class="img-responsive" src="{{$notice->User->avatar}}" alt="avatar">
+                                @endif
+
                             </div>
                         </div>
                         <div class="media-body">
