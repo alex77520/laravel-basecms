@@ -116,7 +116,7 @@
                     success: function (data) {
                         if(data.code == '1'){
                             @if(!Session::has('login_return'))
-                                window.location.href='{{ route("/admin/") }}';
+                                window.location.href='{{ route("/admin") }}';
                             @else
                                 window.location.href='{{ Session::get("login_return") }}';
                             @endif
