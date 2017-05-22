@@ -22,7 +22,7 @@ class CreateTbGroups extends Migration
         *
         */
         Schema::create('tb_groups', function (Blueprint $table) {
-            $table->string('gid')->unique();
+            $table->string('gid','100')->unique();
             $table->integer('uid')->unsigned()->comment('创建者');
             $table->string('name')->nullable()->comment('名称');
             $table->string('secret')->nullable()->comment('密钥');

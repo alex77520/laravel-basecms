@@ -15,7 +15,8 @@ use App\Http\Requests\NoticePost;
 use App\Jobs\SendNotice;
 class MsgController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $where = []; # 查询的条件
         $key = null; # 存储搜索KEY的条件，因为要匹配3个不同字段，所以要用or
         $search = []; # 存储搜索的条件，用于展示
