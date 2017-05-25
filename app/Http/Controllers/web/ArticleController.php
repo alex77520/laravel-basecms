@@ -511,7 +511,7 @@ class ArticleController extends Controller
         if($Post->cover != null){
             $pictures = explode(",",$Post->cover);
             $imgs = [];
-            dd($imgs);
+            dd($pictures);
             foreach($pictures as $key => $picture){
                 $file = Resources::where('id' , $picture)->first();
                 if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
