@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTbMembers extends Migration
+class CreateTbMembersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,6 @@ class CreateTbMembers extends Migration
      */
     public function up()
     {
-        /**
-        * 会员表
-        * 
-        */
         Schema::create('tb_members', function (Blueprint $table) {
             $table->increments('mid');
             $table->string('mobile',11)->nullable()->comment('手机号');
@@ -39,6 +35,6 @@ class CreateTbMembers extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('tb_members');
     }
 }

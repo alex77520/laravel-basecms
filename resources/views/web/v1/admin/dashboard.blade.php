@@ -286,6 +286,7 @@
 				</div><!-- .widget -->
 			</div>
 		</div><!-- .row --> --}}
-
 	</div></section>
+@stop
+@section('js')
 @stop

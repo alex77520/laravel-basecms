@@ -83,7 +83,7 @@ class PostController extends Controller
     public function post_content(Request $request)
     {
         if(!$request->has('id')){
-            return parent::respError('403','[id]缺失');
+            return parent::respError('405','[id]缺失');
         }
         $where = [
             'post_id' => $request->input('id'),

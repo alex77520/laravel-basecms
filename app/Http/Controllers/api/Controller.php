@@ -3,14 +3,84 @@
 namespace App\Http\Controllers\api;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request as Requests;
 use App\Http\Controllers\Controller as BaseController;
 use App\Http\Controllers\api\service\Error;
+use Illuminate\Support\Facades\Redis;
 
 class Controller extends BaseController
 {
+    public static $data = [
+        'user'  => null,
+        'appid' => null,
+        'token' => null
+    ];
+
     public function __construct(){
+        self::$data['appid'] = Requests::header('appid');
+        if(Requests::header('token')){
+            self::$data['token'] = Requests::header('token');
+            self::$data['user'] = self::getMemberInfo();
+        }
     }
-    public function respSuccess($data){
+    /**
+     * 设置用户信息
+     *
+     * @param type var Description
+     **/
+    public function setMemberInfo($user,&$token)
+    {
+        $userModel = new \StdClass();
+        $userModel->mid = $user->mid;
+        $userModel->mobile = $user->mobile;
+        $userModel->nickname = $user->nickname;
+        $userModel->avatar = $user->avatar;
+        $token = str_random(28);
+        $redisKey = self::$data['appid'] . ":userinfo:" . $token;
+        $redisValue = json_encode($userModel);
+        # 存入redis数据库中
+        $rs = Redis::set($redisKey , $redisValue);
+        if($rs){
+            # 设置一天的过期时间
+            Redis::expire($redisKey , 24 * 3600);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 获取用户信息
+     *
+     * @param type var Description
+     **/
+    public function getMemberInfo()
+    {
+        $key = self::$data['appid'] .":userinfo:" . self::$data['token'];
+        $userInfo = Redis::get($key);
+        if(!$userInfo){
+            return null;
+        }else{
+            return json_decode($userInfo);
+        }
+    }
+    /**
+     * 删除用户信息
+     *
+     * @param type var Description
+     **/
+    public function removeMemberInfo($token = null)
+    {
+        if($token == null){
+            $token = self::$data['token'];
+        }
+        $key = self::$data['appid'] .":userinfo:" . $token;
+        if(Redis::del($key))
+        {
+            return true;
+        }
+        return false;
+    }
+    public static function respSuccess($data){
         return response()->json([
             'status' => true,
             'code' => 200,
@@ -18,14 +88,14 @@ class Controller extends BaseController
             'data' => $data
         ]);
     }
-    public function respError($code = 400,$data = []){
+    public static function respError($code = 400,$data = []){
         return response()->json([
             'status' => false,
             'code' => $code,
             'msg' => Error::getError($code),
             'data' => $data
         ]);
-    }
+    } 
     /**
      * 格式化时间
      *
@@ -59,5 +129,22 @@ class Controller extends BaseController
         }else {
             return date('Y.m',$date);
         }
+    }
+    /**
+     * 验证短信验证码
+     *
+     * @param type var Description
+     **/
+    public function verifySMS($mobile,$code,$key)
+    {
+        if(!$redisData = Redis::get($key)){
+            return false;
+        }
+        $redisData = json_decode($redisData,true);
+        if( ( $mobile === $redisData['mobile'] ) && ( $code === (string)$redisData['code'] ) ){
+            Redis::del($key);
+            return true;
+        }
+        return false;
     }
 }

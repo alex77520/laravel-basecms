@@ -60,5 +60,7 @@ class Kernel extends HttpKernel
         'checkRole' => \App\Http\Middleware\checkRole::class,
         'checkGroup' => \App\Http\Middleware\checkGroup::class,
         'checkGroupStatus' => \App\Http\Middleware\checkGroupStatus::class,
+        'api.base' => \App\Http\Middleware\ApiBase::class,
+        'api.permission' => \App\Http\Middleware\ApiPermission::class,
     ];
 }

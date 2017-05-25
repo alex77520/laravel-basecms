@@ -256,7 +256,7 @@ class ArticleController extends Controller
         }
         if($bindRows <= 0){
             # 分类关系未建立成功，回滚
-            $Post->delete();
+            $Post->forceDelete();
             return parent::ajaxError('选择的分类无效，请重新选择');
         }
         # 添加内容
@@ -266,8 +266,8 @@ class ArticleController extends Controller
         $PostContent->post_id = $Post->post_id;
         if(!$PostContent->save()){
             # 回滚
-            PostRelation::where('post_id',$Post->post_id)->delete();
-            $Post->delete();
+            PostRelation::where('post_id',$Post->post_id)->forceDelete();
+            $Post->forceDelete();
             return parent::ajaxError('服务器异常，请稍后重试');
         }
         parent::GroupLogger('insert',$Post->post_id,"[普通]标题:".$Post->title,"POSTS");
@@ -373,7 +373,7 @@ class ArticleController extends Controller
             return parent::ajaxError('最多选择4个分类发布');
         }
         # 清除分类
-        PostRelation::where('post_id',$Post->post_id)->delete();
+        PostRelation::where('post_id',$Post->post_id)->forceDelete();
         # 循环添加
         foreach($classifys as $classify){
             $ClassifyRelation = new PostRelation;
@@ -469,7 +469,7 @@ class ArticleController extends Controller
         }
         if($bindRows <= 0){
             # 分类关系未建立成功，回滚
-            $Post->delete();
+            $Post->forceDelete();
             return parent::ajaxError('选择的分类无效，请重新选择');
         }
         # 添加内容
@@ -479,8 +479,8 @@ class ArticleController extends Controller
         $PostContent->post_id = $Post->post_id;
         if(!$PostContent->save()){
             # 回滚
-            PostRelation::where('post_id',$Post->post_id)->delete();
-            $Post->delete();
+            PostRelation::where('post_id',$Post->post_id)->forceDelete();
+            $Post->forceDelete();
             return parent::ajaxError('服务器异常，请稍后重试');
         }
         parent::GroupLogger('insert',$Post->post_id,"[Markdown]标题:".$Post->title,"POSTS");
@@ -591,7 +591,7 @@ class ArticleController extends Controller
             return parent::ajaxError('最多选择4个分类发布');
         }
         # 清除分类
-        PostRelation::where('post_id',$Post->post_id)->delete();
+        PostRelation::where('post_id',$Post->post_id)->forceDelete();
         foreach($classifys as $classify){
             $ClassifyRelation = new PostRelation;
             $ClassifyRelation->post_id = $Post->post_id;
@@ -671,6 +671,7 @@ class ArticleController extends Controller
         $classifys = $request->input('classify');  # 该值是数组
         $bindRows = 0; # 绑定成功的数量
         if(count($classifys) > 4){
+            $Post->forceDelete();
             return parent::ajaxError('最多选择4个分类发布');
         }
         foreach($classifys as $classify){
@@ -683,7 +684,7 @@ class ArticleController extends Controller
         }
         if($bindRows <= 0){
             # 分类关系未建立成功，回滚
-            $Post->delete();
+            $Post->forceDelete();
             return parent::ajaxError('选择的分类无效，请重新选择');
         }
         parent::GroupLogger('insert',$Post->post_id,"[图文]标题:".$Post->title,"POSTS");
@@ -795,7 +796,7 @@ class ArticleController extends Controller
             return parent::ajaxError('最多选择4个分类发布');
         }
         # 清除分类
-        PostRelation::where('post_id',$Post->post_id)->delete();
+        PostRelation::where('post_id',$Post->post_id)->forceDelete();
         foreach($classifys as $classify){
             $ClassifyRelation = new PostRelation;
             $ClassifyRelation->post_id = $Post->post_id;
