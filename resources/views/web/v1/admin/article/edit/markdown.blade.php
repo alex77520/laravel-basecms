@@ -303,7 +303,7 @@ function FillImg(data){
             '</div>';
         ids += json[i].id + ',';
     }
-    $("input[name='img']").val(ids);
+    $("input[name='imgs']").val(ids);
     $('.img-list').html(str);
 }
 function FillEditorMd(data){

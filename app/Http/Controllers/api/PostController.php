@@ -37,8 +37,6 @@ class PostController extends Controller
     /**
      * 根据分类ID获取文章
      *
-     * Undocumented function long description
-     *
      * @param type var Description
      **/
     public function post_classify_list(Request $request)

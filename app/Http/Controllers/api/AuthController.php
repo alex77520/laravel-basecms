@@ -184,9 +184,9 @@ class AuthController extends Controller
             return parent::respError('10001');
         }
         // # 获取Redis中的记录
-        // if(!parent::verifySMS($mobile,$code,$key)){
-        //     return parent::respError('400', '验证码错误');
-        // }
+        if(!parent::verifySMS($mobile,$code,$key)){
+            return parent::respError('400', '验证码错误');
+        }
         $Member = new Members;
         $Member->mobile = $mobile;
         $Member->password = Hash::make($password);
