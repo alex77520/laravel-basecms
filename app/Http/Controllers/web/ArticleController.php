@@ -297,9 +297,14 @@ class ArticleController extends Controller
             $pictures = explode(",",$Post->cover);
             $imgs = [];
             foreach($pictures as $key => $picture){
-                $file = Resources::where('id' , $picture)->first();
-                if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
-                    $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                if(strlen($picture) > 0){
+                    $file = Resources::where('id' , $picture)->first();
+                    if($file != null)
+                    {
+                        if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
+                            $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                        }
+                    }
                 }
             }
             $Post->images = $imgs;
@@ -511,11 +516,15 @@ class ArticleController extends Controller
         if($Post->cover != null){
             $pictures = explode(",",$Post->cover);
             $imgs = [];
-            dd($pictures);
             foreach($pictures as $key => $picture){
-                $file = Resources::where('id' , $picture)->first();
-                if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
-                    $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                if(strlen($picture) > 0){
+                    $file = Resources::where('id' , $picture)->first();
+                    if($file != null)
+                    {
+                        if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
+                            $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                        }
+                    }
                 }
             }
             $Post->images = $imgs;
@@ -719,9 +728,14 @@ class ArticleController extends Controller
             $pictures = explode(",",$Post->cover);
             $imgs = [];
             foreach($pictures as $key => $picture){
-                $file = Resources::where('id' , $picture)->first();
-                if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
-                    $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                if(strlen($picture) > 0){
+                    $file = Resources::where('id' , $picture)->first();
+                    if($file != null)
+                    {
+                        if(in_array($file->type,['png','jpg','jpeg','gif','bmp'])){
+                            $imgs[] = parent::ResourcePath($file->path,$file->filename);
+                        }
+                    }
                 }
             }
             $Post->images = $imgs;
